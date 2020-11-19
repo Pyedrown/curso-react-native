@@ -1,13 +1,29 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import Header from './components/Header'
+import api from './services/api'
 
 function App() {
 
-  const [projects, setProjects] = useState(["Facebook", "Uber"])
+  const [projects, setProjects] = useState([])
 
-  function handleAddProject(){
+  useEffect(() => {
+    api.get('projeto').then(response => {
+      setProjects(response.data)
+    })
+  }, [])
 
-    setProjects([...projects, `Projeto criado em: ${Date.now()}`])
+  async function handleAddProject(){
+
+    // setProjects([...projects, `Projeto criado em: ${Date.now()}`])
+    const response = await api.post('projeto', {
+      title: `Projeto estático: ${Date.now()}`,
+      dev: "Samuel"
+    })
+
+    const projeto = response.data
+
+    setProjects([...projects, projeto])
+
 
   }
 
@@ -16,8 +32,8 @@ function App() {
         <Header title="React">
           <ul>
             {projects.map(project => (
-              <li key={project}>
-                {project}
+              <li key={project.id}>
+                {project.title}
               </li>
             ))}
           </ul>
@@ -26,8 +42,13 @@ function App() {
         <button type="button" onClick={handleAddProject}>
           Adicionar Projeto
         </button>
+
     </>
   )
 }
 
 export default App;
+
+/*
+backend => npm install cors
+*/
